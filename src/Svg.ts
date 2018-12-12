@@ -6,7 +6,8 @@ import {Const} from './Util';
 import {Pt, Group, Bound} from './Pt';
 import {Rectangle} from "./Op";
 import {DOMSpace} from "./Dom";
-import {PtLike, GroupLike, IPlayer, DOMFormContext} from "./Types";
+import {PtLike, GroupLike, IPlayer, DOMFormContext, TextAlign, TextBaseline} from "./Types";
+import {Typography as Typo} from "./Typography";
 
 
 
@@ -141,7 +142,9 @@ export class SVGForm extends VisualForm {
     },
     font: "11px sans-serif",
     fontSize: 11,
-    fontFamily: "sans-serif"
+    fontFamily: "sans-serif",
+    textAlign: "left",
+    textBaseline: "top",
   };
   
   static groupID:number = 0;
@@ -262,6 +265,54 @@ export class SVGForm extends VisualForm {
     return this;
   }
   
+
+  /**
+   * Get the width of this text. It will return an actual measurement.
+   * @param c a string of text contents
+   */
+  getTextWidth(c:string):number {
+    return Typo.getTextWidth(this.currentFont.value, c);
+  }
+
+
+  /**
+   * Truncate text to fit width.
+   * @param str text to truncate
+   * @param width width to fit
+   * @param tail text to indicate overflow such as "...". Default is empty "".
+   */
+  protected _textTruncate( str:string, width:number, tail:string="" ):[string, number] {
+    return Typo.truncate( this.getTextWidth.bind(this), str, width, tail );
+  }
+
+  /**
+   * Align text within a rectangle box.
+   * @param box a Group that defines a rectangular box
+   * @param vertical a string that specifies the vertical alignment in the box: "top", "bottom", "middle", "start", "end"
+   * @param offset Optional offset from the edge (like padding)
+   * @param center Optional center position 
+   */
+  protected _textAlign( box:GroupLike, vertical:string, offset?:PtLike, center?:Pt ):Pt {
+    if (!center) center = Rectangle.center( box );
+
+    var px = box[0][0];
+    if (this._ctx.textAlign == "end" || this._ctx.textAlign == "right") {
+      px = box[1][0];
+    // @ts-ignore
+    } else if (this._ctx.textAlign == "center" || this._ctx.textAlign == "middle") {
+      px = center[0];
+    }
+
+    var py = center[1];
+    if (vertical == "top" || vertical == "start") {
+      py = box[0][1];
+    } else if (vertical == "end" || vertical == "bottom") {
+      py = box[1][1];
+    }
+
+    return (offset) ? new Pt( px+offset[0], py+offset[1] ) : new Pt(px, py);
+  }
+
 
   /**
   * Reset the context's common styles to this form's styles. This supports using multiple forms in the same space.
@@ -664,6 +715,40 @@ export class SVGForm extends VisualForm {
     return this;
   }
   
+
+  /**
+   * Fit a single-line text in a rectangular box.
+   * @param box a rectangle box defined by a Group
+   * @param txt string of text
+   * @param tail text to indicate overflow such as "...". Default is empty "".
+   * @param verticalAlign "top", "middle", or "bottom" to specify vertical alignment inside the box
+   * @param overrideBaseline If `true`, use the corresponding baseline as verticalAlign. If `false`, use the current canvas context's textBaseline setting. Default is `true`.
+   */
+  textBox( box:GroupLike, txt:string, verticalAlign:string="middle", tail:string="", overrideBaseline:boolean=true): this {
+    // @ts-ignore
+    if (overrideBaseline) this._ctx.textBaseline = verticalAlign;
+    let size = Rectangle.size( box );
+    let t = this._textTruncate( txt, size[0], tail );
+    this.text( this._textAlign( box, verticalAlign ), t[0] );
+    return this;
+  }
+
+
+  /**
+   * Set text alignment and baseline (eg, vertical-align).
+   * @param alignment HTML canvas' textAlign option: "left", "right", "center", "start", or "end"
+   * @param baseline HTML canvas' textBaseline option: "top", "hanging", "middle", "alphabetic", "ideographic", "bottom". For convenience, you can also use "center" (same as "middle"), and "baseline" (same as "alphabetic")
+   */
+  alignText( alignment:TextAlign="left", baseline:TextBaseline="alphabetic") {
+    // @ts-ignore
+    if (baseline == "center") baseline = "middle";
+    // @ts-ignore
+    if (baseline == "baseline") baseline = "alphabetic";
+    this._ctx.textAlign = alignment;
+    this._ctx.textBaseline = baseline;
+    return this;
+  }
+
 
   /**
     * A convenient way to draw some text on canvas for logging or debugging. It'll be draw on the top-left of the canvas as an overlay.

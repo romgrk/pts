@@ -383,7 +383,9 @@ export class HTMLForm extends VisualForm {
     },
     font: "11px sans-serif",
     fontSize: 11,
-    fontFamily: "sans-serif"
+    fontFamily: "sans-serif",
+    textAlign: "left",
+    textBaseline: "top",
   };
 
   static groupID:number = 0;

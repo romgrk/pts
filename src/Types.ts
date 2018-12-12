@@ -96,6 +96,18 @@ export type ColorType = "rgb"|"hsl"|"hsb"|"lab"|"lch"|"luv"|"xyz";
 
 
 /**
+ * Typescript only: TextAlign is a type alias for possible text alignment values
+ */
+export type TextAlign = "left" | "right" | "center" | "start" | "end";
+
+
+/**
+ * Typescript only: TextBaseline is a type alias for possible text baseline values
+ */
+export type TextBaseline = "top" | "hanging" | "middle" | "alphabetic" | "ideographic" | "bottom" | "center" | "baseline";
+
+
+/**
  * Typescript only: A DelaunayShape represents an object type that can store a Delaunay element. It has 3 indices (i, j, k) and two groups that represent a triangle and a circle.
  */
 export type DelaunayShape = {i:number, j:number, k:number, triangle:GroupLike, circle:Group };
@@ -115,7 +127,8 @@ export type DOMFormContext = {
   currentID:string,
   currentClass?:string,
   style:object,
-  font:string, fontSize:number, fontFamily:string
+  font:string, fontSize:number, fontFamily:string,
+  textAlign:TextAlign, textBaseline:TextBaseline,
 };
 
 

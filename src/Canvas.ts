@@ -6,9 +6,19 @@ import {Pt, Group, Bound} from "./Pt";
 import {Const} from "./Util";
 import {Typography as Typo} from "./Typography";
 import { Rectangle } from './Op';
-import {PtLike, GroupLike, PtsCanvasRenderingContext2D} from "./Types";
+import {PtLike, GroupLike, PtsCanvasRenderingContext2D, TextAlign, TextBaseline} from "./Types";
 
 
+/**
+ * Typescript only: CanvasLineCap is a type alias for possible lineCap values
+ */
+type CanvasLineCap = "butt" | "round" | "square";
+
+
+/**
+ * Typescript only: CanvasLineJoin is a type alias for possible lineJoin values
+ */
+type CanvasLineJoin = "bevel" | "round" | "miter";
 
 
 /**
@@ -949,7 +959,7 @@ export class CanvasForm extends VisualForm {
      * @param alignment HTML canvas' textAlign option: "left", "right", "center", "start", or "end"
      * @param baseline HTML canvas' textBaseline option: "top", "hanging", "middle", "alphabetic", "ideographic", "bottom". For convenience, you can also use "center" (same as "middle"), and "baseline" (same as "alphabetic")
      */
-    alignText( alignment:CanvasTextAlign="left", baseline:CanvasTextBaseline="alphabetic") {
+    alignText( alignment:TextAlign="left", baseline:TextBaseline="alphabetic") {
       // @ts-ignore
       if (baseline == "center") baseline = "middle";
       // @ts-ignore

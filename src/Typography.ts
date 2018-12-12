@@ -8,6 +8,20 @@ import {GroupLike} from "./Types";
  */
 export class Typography {
 
+  static canvas = document.createElement('canvas');
+  static context = Typography.canvas.getContext('2d');
+
+  /**
+   * Use a canvas to get the precise text width
+   * @param font the font specification
+   * @param text text to measure
+   * @return a function that can estimate text width
+   */
+  static getTextWidth( font:string, text:string  ):number {
+    Typography.context.font = font;
+    return Typography.context.measureText(text).width;
+  }
+
   /**
    * Create a heuristic text width estimate function. It will be less accurate but faster.
    * @param fn a reference function that can measure text width accurately
